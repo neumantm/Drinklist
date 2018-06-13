@@ -69,7 +69,7 @@ function getJSON(url, callback) {
 		data: null,
 		headers: { 'X-Auth-Token': localStorage.getItem('token') },
 		statusCode: {
-			403: logout,
+			403: error_logout,
 		},
 		success: function(data) {
 			callback(JSON.parse(data));
@@ -108,6 +108,9 @@ function passwordKeyUp(event) {
 				updateUserList();
 				updateBeveageList();
 				deselectUser();
+			} else {
+				_('#password').val('');
+				alert('Wrong Password !');
 			}
 		});
 	}
@@ -151,6 +154,11 @@ function cofirmed_logout() {
 	logout();
 }
 
+function error_logout() {
+	alert('A Error occured during your last request. Please try again!');
+	logout();
+}
+
 function logout() {
 	$.ajax({
 		type: 'POST',
@@ -161,6 +169,7 @@ function logout() {
 }
 
 function selectPage() {
+	window.scrollTo(0, 0);
 	if (localStorage.getItem('root') == 'true') {
 		_('#btnadmin').show();
 		_('#spnavbtn').addClass('btn-group');
@@ -327,8 +336,6 @@ function addHistoryEntry(entry) {
 					updateUserHistory();
 				}
 			});
-			updateMoney();
-			updateUserHistory();
 		}).append($('<td></td>')
 		.text(entry.reason))
 		.append($('<td></td>')

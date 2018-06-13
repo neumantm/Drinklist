@@ -19,58 +19,72 @@ const dirname      = fs.realpathSync('./');
 const databaseFile = dirname + '/data/history.db';
 const authFile     = dirname + '/data/auth.json';
 const settingsFile = dirname + '/data/settings.json';
+const legalFile    = dirname + '/data/legal.html';
+const imprintFile    = dirname + '/data/imprint.html';
 
 exports.checkAndCreateFiles = checkAndCreateFiles;
 exports.writeFile = writeFile;
 exports.recreateDB = recreateDB;
 
 function checkAndCreateFiles() {
-        if(!fs.existsSync(databaseFile)) {
-            recreateDB();
-        }
+	if(!fs.existsSync(databaseFile)) {
+		recreateDB();
+	}
 
-        if(!fs.existsSync(authFile)) {
-            writeDefaultAuthFile();
-        }
+	if(!fs.existsSync(authFile)) {
+		writeDefaultAuthFile();
+	}
 
-        if(!fs.existsSync(settingsFile)) {
-            writeDefaultSettingsFile();
-        }
+	if(!fs.existsSync(settingsFile)) {
+		writeDefaultSettingsFile();
+	}
+
+	if (!fs.existsSync(legalFile)) {
+		createEmptyLegalFile()
+	}
+
+	if (!fs.existsSync(imprintFile)) {
+		createEmptyImprintFile()
+	}
 }
 
 function writeDefaultAuthFile() {
-        //Default data
-        let authData = [
-                {
-                        "password": "secret",
-                        "root": false
-                },
-                {
-                        "password": "superSecret",
-                        "root": true
-                }
-        ];
+	//Default data
+	let authData = [
+		{
+			"password": "secret",
+			"root": false
+		},
+		{
+			"password": "superSecret",
+			"root": true
+		}
+	];
 
 	writeFile('auth', authFile, authData);
 }
 
 function writeDefaultSettingsFile() {
-        //Default data
-        let settingsData = {
-                "apiPort":   8080,
-                "userPort":  8081,
-                "adminPort": 8082,
-                "apiPath":   "http://localhost:8080/",
-                "userPath":  "http://localhost:8081/",
-                "adminPath": "http://localhost:8082/"
-        }
+	//Default data
+	let settingsData = {
+		"apiPort":   8080,
+		"userPort":  8081,
+		"adminPort": 8082,
+		"apiPath":   "http://localhost:8080/",
+		"userPath":  "http://localhost:8081/",
+		"adminPath": "http://localhost:8082/"
+	}
 
 	writeFile('settings', settingsFile, settingsData);
 }
 
-function writeFile(name, path, data) {
+function writeFile(name, path, data, raw=false) {
 	try {
-		fs.writeFileSync(path, JSON.stringify(data));
+		if (raw) {
+			fs.writeFileSync(path, data);
+		} else {
+			fs.writeFileSync(path, JSON.stringify(data));
+		}
 	} catch(e) {
 		console.log("Error creating the " + name + " file at: " + path);
 		console.log(err);
@@ -101,3 +115,28 @@ function recreateDB() {
 	console.log("The database was created at: " + databaseFile);
 }
 
+function createEmptyLegalFile() {
+	const data = `
+<html>
+	<head>
+	</head>
+	<body>
+		Example Legal Text and Dataprotection Statements
+	</body>
+</html>
+`;
+	writeFile('legal', legalFile, data, true);
+}
+
+function createEmptyImprintFile() {
+	const data = `
+<html>
+	<head>
+	</head>
+	<body>
+		Example Imprint
+	</body>
+</html>
+`;
+	writeFile('imprint', imprintFile, data, true);
+}
